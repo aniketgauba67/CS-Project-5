@@ -1,0 +1,85 @@
+// Include necessary headers
+#include <iostream>
+#include <cstring>
+#include <vector>
+
+using namespace std;
+
+// Function to find fragments in the donor sequence
+void find_fragments(const char* donor, const char** fragments, int n, vector<int>& result) {
+int dlen = strlen(donor);
+// Loop through all fragments
+for (int i = 0; i < n; i++) {
+const char* frag = fragments[i];
+int flen = strlen(frag);
+int found_index = -1;
+// Loop through the donor sequence to find fragment
+for (int j = 0; j <= dlen - flen; j++) {
+if (strncmp(donor + j, frag, flen) == 0) {
+if (found_index == -1) {
+found_index = j;
+} else {
+// Add -1 to indicate overlap if fragment found multiple times
+result.push_back(-1);
+break;
+}
+}
+}
+// Add the index of found fragment or -1 for not found to the result vector
+result.push_back(found_index);
+}
+}
+
+// Main function
+int main() {
+// Read input values
+char donor[101];
+cin >> donor;
+int n;
+cin >> n;
+
+// Allocate memory for fragment array
+const char** fragments = new const char*[n];
+for (int i = 0; i < n; i++) {
+    char* frag = new char[101];
+    cin >> frag;
+    fragments[i] = frag;
+}
+
+// Call find_fragments function to get result vector
+vector<int> result;
+find_fragments(donor, fragments, n, result);
+
+// Loop through result vector to print output
+for (int i = 0; i < n; i++) {
+    const char* frag = fragments[i];
+    int index = result[i];
+    if (index >= 0) {
+        // Print fragment found message
+        cout << frag << " is found at index " << index;
+        if (i > 0) {
+            // Check for overlap with previously found fragments
+            for (int j = 0; j < i; j++) {
+                if (result[j] >= 0 && result[j] <= index && result[j] + strlen(fragments[j]) > index) {
+                    cout << " overlap";
+                    break;
+                }
+            }
+        }
+        // Print end of line
+        cout << "." << endl;
+    } else {
+        // Print fragment not found message
+        cout << frag << " is not found." << endl;
+    }
+}
+
+// Free memory allocated for fragments array
+for (int i = 0; i < n; i++) {
+    delete[] fragments[i];
+}
+delete[] fragments;
+
+// Return success status
+return 0;
+}
